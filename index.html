@@ -200,6 +200,32 @@
     <p class="text-sm mt-2">Daftar siswa akan otomatis muncul di sini.</p>
   </div>
 
+  <!-- ================= FIREBASE INITIALIZATION & EXPORT ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxy_aOtOcbDIzCKxxKxzcZgQSi4-YUT6g",
+      authDomain: "informatika-fun.firebaseapp.com",
+      databaseURL: "https://daftarhadirinformatika-default-rtdb.firebaseio.com",
+      projectId: "informatika-fun",
+      storageBucket: "informatika-fun.firebasestorage.app",
+      messagingSenderId: "869889926091",
+      appId: "1:869889926091:web:7d4d08db90802b8e26cc4e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app, "https://daftarhadirinformatika-default-rtdb.firebaseio.com");
+    
+    window.db = db;
+    window.firebaseRef = ref;
+    window.firebaseSet = set;
+    window.firebaseGet = get;
+    window.firebaseOnValue = onValue;
+    window.firebaseOff = off;
+  </script>
+
   <!-- ================= JAVASCRIPT LOGIKA APLIKASI ================= -->
   <script>
     const databaseSiswa = {
@@ -317,9 +343,10 @@
       const kelas = document.getElementById("selectKelas").value;
       const pertemuan = document.getElementById("selectPertemuan").value;
       
-      if (!kelas || !pertemuan || !window.firebaseOnValue) return;
+      if (!kelas || !pertemuan || !window.firebaseOnValue || !window.db) return;
 
-      const dbRef = window.firebaseRef(window.db, 'absensi/' + kelas + '/' + pertemuan);
+      const safeKelas = kelas.replace(/\./g, '_');
+      const dbRef = window.firebaseRef(window.db, 'absensi/' + safeKelas + '/' + pertemuan);
       if (currentListener) window.firebaseOff(currentListener);
       
       currentListener = dbRef;
@@ -330,8 +357,6 @@
         if (data && data.students) {
           if (data.tanggal) document.getElementById("inputTanggal").value = data.tanggal;
           data.students.forEach(s => absensiState[s.nama] = s.status);
-        } else {
-          document.getElementById("inputTanggal").value = "";
         }
         
         const keyword = document.getElementById("inputCari").value;
@@ -343,6 +368,10 @@
     }
 
     function simpanAbsensi() {
+      if (!window.db || !window.firebaseSet || !window.firebaseRef) {
+        return Swal.fire({ icon: 'error', title: 'Koneksi Belum Siap', text: 'Koneksi ke Firebase sedang disiapkan, silakan tunggu sebentar dan coba lagi.' });
+      }
+
       const kelas = document.getElementById("selectKelas").value;
       const tanggal = document.getElementById("inputTanggal").value;
       const pertemuan = document.getElementById("selectPertemuan").value;
@@ -362,10 +391,12 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> MENYIMPAN...';
       btn.disabled = true;
 
-      const dbRef = window.firebaseRef(window.db, 'absensi/' + kelas + '/' + pertemuan);
+      const safeKelas = kelas.replace(/\./g, '_');
+      const dbRef = window.firebaseRef(window.db, 'absensi/' + safeKelas + '/' + pertemuan);
+
       window.firebaseSet(dbRef, payload)
         .then(() => Swal.fire({ icon: 'success', title: 'Berhasil!', text: '✓ Absensi tersimpan dan ter-update di semua perangkat!' }))
-        .catch(err => Swal.fire({ icon: 'error', title: 'Gagal', text: err.message }))
+        .catch(err => Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', text: 'Terjadi kesalahan: ' + err.message }))
         .finally(() => { btn.innerHTML = textLama; btn.disabled = false; });
     }
 
@@ -382,6 +413,10 @@
       const kelas = document.getElementById("selectKelas").value;
       if (!kelas) return Swal.fire({ icon: 'warning', text: '⚠ Silakan pilih kelas terlebih dahulu.' });
 
+      if (!window.db || !window.firebaseGet || !window.firebaseRef) {
+        return Swal.fire({ icon: 'error', title: 'Koneksi Belum Siap', text: 'Koneksi ke Firebase sedang disiapkan, silakan tunggu sebentar.' });
+      }
+
       Swal.fire({
         title: 'Menyiapkan File...',
         text: 'Sedang membuat Excel sesuai format...',
@@ -390,7 +425,8 @@
       });
 
       try {
-        const classRef = window.firebaseRef(window.db, 'absensi/' + kelas);
+        const safeKelas = kelas.replace(/\./g, '_');
+        const classRef = window.firebaseRef(window.db, 'absensi/' + safeKelas);
         const snapshot = await window.firebaseGet(classRef);
         const allData = snapshot.val() || {}; 
 
@@ -451,33 +487,6 @@
         Swal.fire({ icon: 'error', title: 'Gagal Download', text: error.message });
       }
     }
-  </script>
-
-  <!-- ================= FIREBASE INITIALIZATION & EXPORT ================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
-    // Konfigurasi Firebase dengan databaseURL yang valid
-    const firebaseConfig = {
-      apiKey: "AIzaSyBxy_aOtOcbDIzCKxxKxzcZgQSi4-YUT6g",
-      authDomain: "informatika-fun.firebaseapp.com",
-      databaseURL: "https://daftarhadirinformatika-default-rtdb.firebaseio.com",
-      projectId: "informatika-fun",
-      storageBucket: "informatika-fun.firebasestorage.app",
-      messagingSenderId: "869889926091",
-      appId: "1:869889926091:web:7d4d08db90802b8e26cc4e"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    
-    window.db = db;
-    window.firebaseRef = ref;
-    window.firebaseSet = set;
-    window.firebaseGet = get;
-    window.firebaseOnValue = onValue;
-    window.firebaseOff = off;
   </script>
 
 </body>
