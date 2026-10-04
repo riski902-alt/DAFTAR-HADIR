@@ -463,5 +463,27 @@
       }).getSpreadsheetUrl();
     }
   </script>
+
+  <!-- ================= FIREBASE INITIALIZATION ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+
+    // Konfigurasi Firebase dari aplikasi web Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxy_aOtOcbDIzCKxxKxzcZgQSi4-YUT6g",
+      authDomain: "informatika-fun.firebaseapp.com",
+      projectId: "informatika-fun",
+      storageBucket: "informatika-fun.firebasestorage.app",
+      messagingSenderId: "869889926091",
+      appId: "1:869889926091:web:7d4d08db90802b8e26cc4e",
+      measurementId: "G-QRY003YPJ3"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+
 </body>
 </html>
