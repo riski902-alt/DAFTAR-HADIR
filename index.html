@@ -8,16 +8,15 @@
   <meta charset="UTF-8">
   <title>Daftar Hadir - Informatika Fun</title>
   
-  <!-- Tailwind CSS untuk styling yang cepat dan modern -->
+  <!-- Tailwind CSS untuk styling -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SweetAlert2 untuk notifikasi alert yang keren -->
+  <!-- SweetAlert2 untuk notifikasi alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Library SheetJS untuk Download Excel sesuai format -->
+  <!-- Library SheetJS untuk Download Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- FontAwesome untuk Icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Konfigurasi Tema Warna (Sesuai Konsep Desain) -->
   <script>
     tailwind.config = {
       theme: {
@@ -36,9 +35,8 @@
   </script>
 
   <style>
-    /* Styling Custom untuk efek Glassmorphism */
     body {
-      background-color: #F0F9FF; /* very-soft-blue */
+      background-color: #F0F9FF;
       background-image: radial-gradient(circle at top right, #E0F2FE 0%, transparent 40%),
                         radial-gradient(circle at bottom left, #E0F2FE 0%, transparent 40%);
       background-attachment: fixed;
@@ -54,7 +52,6 @@
       border-radius: 1rem;
     }
 
-    /* Custom Radio Buttons untuk Status Kehadiran (Segmented Control style) */
     .status-radio input[type="radio"] {
       display: none;
     }
@@ -72,7 +69,6 @@
       border: 1px solid transparent;
     }
     
-    /* Warna aktif ketika dipilih */
     .status-radio input[value="Hadir"]:checked + label { background-color: #10B981; color: white; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); }
     .status-radio input[value="Sakit"]:checked + label { background-color: #3B82F6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); }
     .status-radio input[value="Izin"]:checked + label { background-color: #F59E0B; color: white; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3); }
@@ -122,7 +118,6 @@
         <label class="block text-sm font-bold text-dusty-blue mb-2"><i class="fas fa-book-open mr-2"></i>PILIH PERTEMUAN</label>
         <select id="selectPertemuan" class="w-full p-3 rounded-xl border border-blue-100 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-soft-denim transition">
           <option value="">-- Pilih Pertemuan --</option>
-          <!-- Digenerate oleh JS -->
         </select>
       </div>
 
@@ -176,8 +171,6 @@
 
   <!-- ================= TABEL ABSENSI ================= -->
   <div class="glass-card overflow-hidden" id="panelTabel" style="display: none;">
-    
-    <!-- Pencarian Siswa -->
     <div class="p-4 border-b border-white/50 bg-white/30">
       <div class="relative">
         <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
@@ -185,7 +178,6 @@
       </div>
     </div>
 
-    <!-- Container Tabel -->
     <div class="overflow-x-auto p-4">
       <table class="w-full text-left border-collapse" id="tabelSiswa">
         <thead>
@@ -202,7 +194,6 @@
     </div>
   </div>
 
-  <!-- Pesan belum pilih kelas -->
   <div id="pesanAwal" class="text-center p-12 text-dusty-blue glass-card">
     <i class="fas fa-clipboard-list text-6xl mb-4 opacity-50"></i>
     <h3 class="text-xl font-bold">Silakan pilih kelas terlebih dahulu.</h3>
@@ -211,7 +202,6 @@
 
   <!-- ================= JAVASCRIPT LOGIKA APLIKASI ================= -->
   <script>
-    // Database nama siswa
     const databaseSiswa = {
       "VII.1": ["FARIS NAUVAL", "ABDILLAH KHUSAIRY", "AQIFAH NUR AIN", "ARMAN ARDI", "FAIS MUBARAT", "IMAM AL GHAZALI", "KHAERUNNISA", "MUH. FADLI", "MUH. FAIZ ADZANI", "MUH. FAQIH ISKANDAR", "MUH. RAFA DZAKWANSYAM", "MUHAMMAD ALIF AKBAR", "MUHAMMAD ASKAR", "MUHAMMAD AZHAR", "NUR ALISAH PUTRI", "NUR ANNISA", "NURFADILA ZAHRA", "NURLIYANA RAMADANI", "RAHMAT HIDAYAT", "REZKI AULIA", "RISKA AULIA SAPUTRI"],
       "VII.2": ["AISHA FARHANA", "AKBAR", "ARIL SAPUTRA", "ASHIRATUL SYAHRA", "AURA KASIH", "ERWING", "IZZATUL MUNAWIR", "MUH. ASFAR", "MUH. ASHRAF", "MUH. FAISAL", "MUH. SYAWAL", "MUHAMMAD ALQAF AL BUQHARI", "MUNAWWARA", "MUTFIKA WANA", "NAUFAL AFKRA ZAINAL", "NUR RAYATUL YUSDA", "NURFADLA", "RAMADAN", "RIFKY IBNU HARSAD", "WAHYU ASHARI", "ZELDA SAVITRI ANWAR"],
@@ -226,7 +216,6 @@
     let absensiState = {}; 
     let currentListener = null;
 
-    // Inisialisasi dropdown pertemuan
     document.addEventListener("DOMContentLoaded", function() {
       const selectPertemuan = document.getElementById("selectPertemuan");
       for (let i = 1; i <= 19; i++) {
@@ -239,7 +228,6 @@
       selectPertemuan.addEventListener("change", listenDataRealtime);
     });
 
-    // Menangani saat kelas dipilih
     function gantiKelas() {
       const kelas = document.getElementById("selectKelas").value;
       if (!kelas) {
@@ -262,7 +250,6 @@
       listenDataRealtime();
     }
 
-    // Merender baris tabel siswa
     function renderTabel(dataSiswa) {
       const tbody = document.getElementById("bodyTabelSiswa");
       tbody.innerHTML = "";
@@ -295,13 +282,11 @@
       });
     }
 
-    // Mencatat klik absensi pada State
     function catatStatus(nama, status) {
       absensiState[nama] = status;
       updateStatistik();
     }
 
-    // Fitur hadir semua
     function hadirSemua() {
       if (currentStudents.length === 0) return Swal.fire({ icon: 'warning', text: '⚠ Silakan pilih kelas terlebih dahulu.' });
       currentStudents.forEach(nama => absensiState[nama] = "Hadir");
@@ -309,7 +294,6 @@
       updateStatistik();
     }
 
-    // Menghitung kartu stat
     function updateStatistik() {
       let h = 0, s = 0, i = 0, a = 0;
       currentStudents.forEach(nama => {
@@ -323,14 +307,12 @@
       document.getElementById("statAlpa").innerText = a;
     }
 
-    // Pencarian kotak teks
     function cariSiswa() {
       const keyword = document.getElementById("inputCari").value.toUpperCase();
       const filtered = currentStudents.filter(nama => nama.includes(keyword));
       renderTabel(filtered); 
     }
 
-    // Fitur sinkronisasi real-time
     function listenDataRealtime() {
       const kelas = document.getElementById("selectKelas").value;
       const pertemuan = document.getElementById("selectPertemuan").value;
@@ -360,7 +342,6 @@
       });
     }
 
-    // Fitur Simpan Firebase
     function simpanAbsensi() {
       const kelas = document.getElementById("selectKelas").value;
       const tanggal = document.getElementById("inputTanggal").value;
@@ -397,7 +378,6 @@
       });
     }
 
-    // Fitur unduh Excel sesuai kerangka
     async function downloadExcel() {
       const kelas = document.getElementById("selectKelas").value;
       if (!kelas) return Swal.fire({ icon: 'warning', text: '⚠ Silakan pilih kelas terlebih dahulu.' });
@@ -414,7 +394,6 @@
         const snapshot = await window.firebaseGet(classRef);
         const allData = snapshot.val() || {}; 
 
-        // Membuat layout struktur sel Excel dari baris ke baris
         const ws_data = [
           ["PEMERINTAH KABUPATEN SINJAI"],
           ["KECAMATAN BULUPODDO"],
@@ -431,7 +410,6 @@
           ["", "", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         ];
 
-        // Menyusun baris masing-masing siswa dan menghitung rekapan kehadiran total
         currentStudents.forEach((nama, index) => {
           let row = [index + 1, nama];
           let [t_H, t_I, t_S, t_A] = [0, 0, 0, 0];
@@ -456,18 +434,16 @@
 
         const ws = XLSX.utils.aoa_to_sheet(ws_data);
         
-        // Menggabungkan cell (Merge) pada baris Header agar rapi
         if(!ws['!merges']) ws['!merges'] = [];
         ws['!merges'].push(
-          { s: {r:13, c:2}, e: {r:13, c:20} }, // PERTEMUAN KE- (1 sd 19)
-          { s: {r:13, c:0}, e: {r:14, c:0} },  // Merge Teks NO
-          { s: {r:13, c:1}, e: {r:14, c:1} }   // Merge Teks NAMA
+          { s: {r:13, c:2}, e: {r:13, c:20} },
+          { s: {r:13, c:0}, e: {r:14, c:0} },
+          { s: {r:13, c:1}, e: {r:14, c:1} }
         );
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, kelas);
         
-        // Panggil download dari peramban
         XLSX.writeFile(wb, `Daftar_Hadir_${kelas}.xlsx`);
         Swal.fire({ icon: 'success', title: 'Berhasil!', text: '✓ Excel berformat rapi berhasil diunduh!' });
 
@@ -480,24 +456,22 @@
   <!-- ================= FIREBASE INITIALIZATION & EXPORT ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    // Mengimpor fungsi Realtime Database secara spesifik
     import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    // Konfigurasi Firebase-mu
+    // Konfigurasi Firebase dengan databaseURL yang valid
     const firebaseConfig = {
       apiKey: "AIzaSyBxy_aOtOcbDIzCKxxKxzcZgQSi4-YUT6g",
       authDomain: "informatika-fun.firebaseapp.com",
+      databaseURL: "https://daftarhadirinformatika-default-rtdb.firebaseio.com",
       projectId: "informatika-fun",
       storageBucket: "informatika-fun.firebasestorage.app",
       messagingSenderId: "869889926091",
       appId: "1:869889926091:web:7d4d08db90802b8e26cc4e"
     };
 
-    // Inisialisasi Firebase App dan Database
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    // Mengekspos fungsi database ke objek global (window) agar bisa dipanggil oleh fungsi Javascript biasa (skrip di atas)
     window.db = db;
     window.firebaseRef = ref;
     window.firebaseSet = set;
